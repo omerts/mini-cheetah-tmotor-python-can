@@ -1,7 +1,8 @@
+import math
 import socket
 import struct
 import time
-import math
+
 from bitstring import BitArray
 
 # Initial Code Taken From: https://elinux.org/Python_Can
@@ -20,6 +21,7 @@ legitimate_motors = [
                     "AK80_6_V1",
                     "AK80_6_V1p1",
                     "AK80_6_V2",
+                    "AK80_64_V1",
                     "AK80_9_V1p1",
                     "AK80_9_V2",
                     "AK10_9_V1p1"
@@ -70,6 +72,21 @@ AK80_6_V2_PARAMS = {
                 "T_MAX" : 12.0,
                 "AXIS_DIRECTION" : 1
                 }
+
+# Working parameters for AK80-64 V1.0 firmware
+AK80_64_V1_PARAMS = {
+    "P_MIN" : -95.5,
+    "P_MAX" : 95.5,
+    "V_MIN" : -30.0,
+    "V_MAX" : 30.0,
+    "KP_MIN" : 0.0,
+    "KP_MAX" : 500,
+    "KD_MIN" : 0.0,
+    "KD_MAX" : 5.0,
+    "T_MIN" : -18.0,
+    "T_MAX" : 18.0,
+    "AXIS_DIRECTION" : -1
+}
 
 # Working parameters for AK80-9 V1.1 firmware
 AK80_9_V1p1_PARAMS = {
@@ -169,8 +186,8 @@ class CanMotorController():
     can_socket_declared = False
     motor_socket = None
 
-    def __init__(self, can_socket='can0', motor_id=0x01, motor_type = 'AK80_6_V1p1',
-                socket_timeout=0.05):
+    def __init__(self, can_socket='can0', motor_id=0x06, motor_type = 'AK80_64_V1',
+                socket_timeout=1):
         """
         Instantiate the class with socket name, motor ID, and socket timeout.
         Sets up the socket communication for rest of the functions.
@@ -184,6 +201,8 @@ class CanMotorController():
             self.motorParams = AK80_6_V1p1_PARAMS
         elif motor_type == 'AK80_6_V2':
             self.motorParams = AK80_6_V2_PARAMS
+        elif motor_type == 'AK80_64_V1':
+            self.motorParams = AK80_64_V1_PARAMS
         elif motor_type == 'AK80_9_V1p1':
             self.motorParams = AK80_9_V1p1_PARAMS
         elif motor_type == 'AK80_9_V2':
